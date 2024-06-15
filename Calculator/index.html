@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basic Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-image: url('./bg.jpg'); 
+    background-size:cover;
+    background-position: center;
+}
+
+.calculator {
+    display: none; 
+    background-color: rgba(242, 244, 246, 0.9); 
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    user-select: none; 
+    animation: showCalculator 1s forwards; 
+}
+
+.display {
+    width: calc(100% - 20px);
+    margin: 10px;
+    padding: 10px;
+    font-size: 36px;
+    text-align: right;
+    border: none;
+    background-color: #f2f4f6;
+    color: #000;
+    border-radius: 8px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+}
+
+.button {
+    padding: 20px;
+    font-size: 24px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    background-color: #e0e5ec;
+    color: #000;
+    border-radius: 50%; 
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #d4d9e0;
+}
+
+.operator {
+    background-color: #f5923e;
+    color: #fff;
+}
+
+.clear {
+    grid-column: span 1;
+}
+
+.equal {
+    grid-column: span 1; 
+    background-color: #f5923e;
+    color: #fff;
+    font-size: 24px; 
+    padding: 16px 20px; 
+}
+
+.button:focus {
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.typing-effect {
+    color: #f5923e;
+    text-align: center;
+    font-size: 36px;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typeAnimation 2s steps(20, end);
+    margin-bottom: 20px;
+    border-right: 2px solid #000;
+    font-family: 'Exo 2', sans-serif; 
+}
+
+@keyframes typeAnimation {
+    from { width: 0; }
+    to { width: 20%; }
+}
+
+@keyframes showCalculator {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="typing-effect" id="typingEffect">
+    Basic Calculator
+</div>
+
+<div class="calculator" id="calculator">
+    <input type="text" id="display" class="display" disabled>
+    <div class="buttons">
+        <button class="button clear" onclick="clearDisplay()">AC</button>
+        <button class="button number" onclick="toggleSign()">+/-</button>
+        <button class="button" onclick="clearLast()">⌫</button>
+        <button class="button operator" onclick="appendToDisplay('/')">÷</button>
+        <button class="button number" onclick="appendToDisplay('7')">7</button>
+        <button class="button number" onclick="appendToDisplay('8')">8</button>
+        <button class="button number" onclick="appendToDisplay('9')">9</button>
+        <button class="button operator" onclick="appendToDisplay('*')">x</button>
+        <button class="button number" onclick="appendToDisplay('4')">4</button>
+        <button class="button number" onclick="appendToDisplay('5')">5</button>
+        <button class="button number" onclick="appendToDisplay('6')">6</button>
+        <button class="button operator" onclick="appendToDisplay('-')">-</button>
+        <button class="button number" onclick="appendToDisplay('1')">1</button>
+        <button class="button number" onclick="appendToDisplay('2')">2</button>
+        <button class="button number" onclick="appendToDisplay('3')">3</button>
+        <button class="button operator" onclick="appendToDisplay('+')">+</button>
+        <button class="button number" onclick="appendToDisplay('0')">0</button>
+        <button class="button" onclick="appendToDisplay('.')">.</button>
+        <button class="button" onclick="calculatePercentage()">%</button>
+        <button class="button equal" onclick="calculate()">=</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typingEffect = document.getElementById('typingEffect');
+    const calculator = document.getElementById('calculator');
+
+    typingEffect.addEventListener('animationend', function() {
+        setTimeout(function() {
+            typingEffect.style.display = 'none'; 
+            calculator.style.display = 'block'; 
+        }, 300); 
+    });
+});
+
+const display = document.getElementById('display');
+
+function appendToDisplay(value) {
+    display.value += value;
+}
+
+function clearDisplay() {
+    display.value = '';
+}
+
+function clearLast() {
+    display.value = display.value.slice(0, -1);
+}
+
+function calculate() {
+    try {
+        const result = eval(display.value);
+        display.value = result;
+    } catch (error) {
+        display.value = 'Error';
+    }
+}
+
+function calculatePercentage() {
+    try {
+        const percent = parseFloat(display.value) / 100;
+        display.value = percent.toString();
+    } catch (error) {
+        display.value = 'Error';
+    }
+}
+
+function toggleSign() {
+    if (display.value.startsWith('-')) {
+        display.value = display.value.slice(1); 
+    } else if (display.value !== '0') {
+        display.value = '-' + display.value; 
+    }
+}
+
+document.addEventListener('keydown', function(event) {
+    const key = event.key;
+    if ((/\d/).test(key) || key === '.' || '+-*/'.indexOf(key) !== -1) {
+        appendToDisplay(key);
+    } else if (key === 'Backspace') {
+        clearLast();
+    } else if (key === 'Enter' || key === '=') {
+        calculate();
+    } else if (key === '%') {
+        calculatePercentage();
+    } else if (key === 's') { 
+        calculateSquareRoot();
+    }
+});
+
+function calculateSquareRoot() {
+    try {
+        const number = parseFloat(display.value);
+        if (number >= 0) {
+            display.value = Math.sqrt(number).toString();
+        } else {
+            display.value = 'Error';
+        }
+    } catch (error) {
+        display.value = 'Error';
+    }
+}
+</script>
+
+</body>
+</html>
